@@ -20,9 +20,27 @@ class PetsController < ApplicationController
     render :json => pet.as_json(only: [:id, :name, :age, :human]), status: :ok
   end
   
-  private
-  
-  def pet_params
-    params.require(:pet).permit(:name, :age, :human)
+  def create
+    puts params
+    pet = Pet.new(pet_params)
+    puts "Made it to create"
+    
+    if pet.save
+      render json: pet.as_json(only: [:id]), status: :created
+      return
+    else
+      render json: {
+        ok: false,
+        errors: pet.errors.messages
+        }, status: :bad_request
+        return
+      end
+    end
+    
+    private
+    
+    def pet_params
+      params.require(:pet).permit(:name, :age, :human)
+    end
   end
-end
+  
